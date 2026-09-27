@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PayPal Fee Calculator — Calculate Fees and Net Amount (2026)</title>
+<meta name="description" content="Free PayPal fee calculator. Enter the amount to see PayPal's transaction fee and what you actually receive, or work backward from a target net amount.">
+<meta name="keywords" content="paypal fee calculator, paypal fees 2026, paypal transaction fee, how much does paypal take, paypal net amount calculator">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="theme-color" content="#003087">
+
+<link rel="canonical" href="https://toolara.dev/paypal-fee-calculator/">
+<link rel="alternate" hreflang="en" href="https://toolara.dev/paypal-fee-calculator/">
+<link rel="alternate" hreflang="zh-Hans" href="https://toolara.dev/paypal-fee-calculator/zh/">
+<link rel="alternate" hreflang="x-default" href="https://toolara.dev/paypal-fee-calculator/">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="PayPal Fee Calculator — Calculate Fees and Net Amount">
+<meta property="og:description" content="See PayPal's transaction fee and what you actually receive after sending or receiving money.">
+<meta property="og:url" content="https://toolara.dev/paypal-fee-calculator/">
+<meta property="og:locale" content="en_US">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "PayPal Fee Calculator",
+  "url": "https://toolara.dev/paypal-fee-calculator/",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "description": "Free calculator that shows PayPal's transaction fees and net amount received.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="lang-switch">
+    <select id="langSelect" onchange="setLang(this.value)" aria-label="Language">
+      <option value="en">English</option>
+      <option value="zh">简体中文</option>
+    </select>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-badge">💳 PayPal Fee Tool</div>
+    <h1 data-i18n="title">PayPal Fee Calculator</h1>
+    <p data-i18n="subtitle">See exactly how much PayPal takes — and what you actually receive after fees.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <h2 class="visually-hidden" data-i18n="calcHeading">Calculator</h2>
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="receive" onclick="switchMode('receive')" data-i18n="modeReceive">Receiving Money</button>
+      <button class="mode-tab" data-mode="send" onclick="switchMode('send')" data-i18n="modeSend">Sending Money</button>
+      <button class="mode-tab" data-mode="target" onclick="switchMode('target')" data-i18n="modeTarget">Target Net Amount</button>
+    </div>
+
+    <!-- Receive mode -->
+    <div id="mode-receive" class="mode-panel">
+      <label for="amount" data-i18n="amountLabel">Amount received ($)</label>
+      <input type="number" id="amount" min="0" step="0.01" placeholder="100.00" value="100" inputmode="decimal">
+    </div>
+
+    <!-- Send mode -->
+    <div id="mode-send" class="mode-panel" style="display:none;">
+      <label for="sendAmount" data-i18n="sendAmountLabel">Amount to send ($)</label>
+      <input type="number" id="sendAmount" min="0" step="0.01" placeholder="100.00" value="100" inputmode="decimal">
+    </div>
+
+    <!-- Target mode -->
+    <div id="mode-target" class="mode-panel" style="display:none;">
+      <label for="targetAmount" data-i18n="targetAmountLabel">Desired net amount ($)</label>
+      <input type="number" id="targetAmount" min="0" step="0.01" placeholder="100.00" value="100" inputmode="decimal">
+      <p class="hint" data-i18n="targetHint">Enter the amount you want to actually receive. The calculator shows how much the sender needs to send.</p>
+    </div>
+
+    <label for="country" data-i18n="countryLabel">Country / region</label>
+    <select id="country">
+      <option value="us" selected data-i18n="countryUs">United States (2.99% + $0.49)</option>
+      <option value="ca" data-i18n="countryCa">Canada (2.99% + CAD 0.49)</option>
+      <option value="uk" data-i18n="countryUk">United Kingdom (2.99% + £0.39)</option>
+      <option value="eu" data-i18n="countryEu">Eurozone (2.99% + €0.39)</option>
+      <option value="au" data-i18n="countryAu">Australia (2.99% + A$0.49)</option>
+      <option value="intl" data-i18n="countryIntl">International / Cross-border (4.99% + fixed fee)</option>
+      <option value="custom" data-i18n="countryCustom">Custom rate</option>
+    </select>
+
+    <details class="advanced">
+      <summary data-i18n="advancedLabel">Advanced fee settings</summary>
+      <div class="row">
+        <div>
+          <label for="feePct" data-i18n="feePctLabel">Fee (%)</label>
+          <input type="number" id="feePct" min="0" step="0.01" value="2.99" inputmode="decimal">
+        </div>
+        <div>
+          <label for="feeFixed" data-i18n="feeFixedLabel">Fixed fee ($)</label>
+          <input type="number" id="feeFixed" min="0" step="0.01" value="0.49" inputmode="decimal">
+        </div>
+      </div>
+      <p class="hint" data-i18n="advancedHint">The default rates reflect standard US commercial transactions. Micropayments, charitable donations, and some industries use different rates.</p>
+    </details>
+
+    <button class="calc" type="button" onclick="calculate()" data-i18n="calcBtn">Calculate</button>
+
+    <div id="result" role="region" aria-live="polite">
+      <div class="result-label" id="resultLabel">—</div>
+      <div class="result-main" id="resultMain">—</div>
+      <div class="result-sub" id="resultSub"></div>
+
+      <div class="breakdown">
+        <div class="bd-row"><span data-i18n="bdGross">Gross amount</span><strong id="bdGross">—</strong></div>
+        <div class="bd-row bd-sub"><span data-i18n="bdPctFee">Percentage fee</span><strong id="bdPctFee">—</strong></div>
+        <div class="bd-row bd-sub"><span data-i18n="bdFixedFee">Fixed fee</span><strong id="bdFixedFee">—</strong></div>
+        <div class="bd-row bd-sub"><span data-i18n="bdTotalFee">Total PayPal fee</span><strong id="bdTotalFee">—</strong></div>
+        <div class="bd-divider"></div>
+        <div class="bd-row bd-total"><span id="bdNetLabel">Net amount</span><strong id="bdNet">—</strong></div>
+      </div>
+
+      <div class="share-row">
+        <button class="share-btn" type="button" onclick="copyShareLink()" data-i18n="shareBtn">Copy shareable link</button>
+        <span class="share-copied" id="shareCopied" data-i18n="shareCopied">Copied!</span>
+      </div>
+
+      <div class="result-disclaimer" data-i18n="resultDisclaimer">Estimate only. PayPal fees vary by country, currency, transaction type, and account status. Verify current fees on PayPal's official fee page.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-i18n="whatIsTitle">How PayPal fees work</h2>
+    <p data-i18n="whatIsText">PayPal charges a percentage-based transaction fee plus a fixed fee per transaction. For commercial transactions in the US, this is typically 2.99% + $0.49. Fees vary by country, currency, and transaction type. Personal transfers between friends and family in the same country are usually free when funded by bank balance or bank account.</p>
+  </section>
+
+  <section>
+    <h2 data-i18n="feesTitle">Common PayPal fees (2026)</h2>
+    <table>
+      <thead>
+        <tr><th data-i18n="thRegion">Region</th><th data-i18n="thRate">Commercial rate</th></tr>
+      </thead>
+      <tbody>
+        <tr><td data-i18n="regionUs">United States</td><td>2.99% + $0.49</td></tr>
+        <tr><td data-i18n="regionCa">Canada</td><td>2.99% + CAD 0.49</td></tr>
+        <tr><td data-i18n="regionUk">United Kingdom</td><td>2.99% + £0.39</td></tr>
+        <tr><td data-i18n="regionEu">Eurozone</td><td>2.99% + €0.39</td></tr>
+        <tr><td data-i18n="regionAu">Australia</td><td>2.99% + A$0.49</td></tr>
+        <tr><td data-i18n="regionIntl">Cross-border</td><td>4.99% + fixed fee</td></tr>
+      </tbody>
+    </table>
+    <p data-i18n="feesNote">Micropayments (transactions under $10) use a different rate: 4.99% + $0.09 in the US. Charitable donations and certain industries also have special rates.</p>
+  </section>
+
+  <section>
+    <h2 data-i18n="formulaTitle">The formulas</h2>
+    <ul>
+      <li data-i18n="formula1"><strong>Fee (receiving):</strong> (Amount × fee%) + fixed fee</li>
+      <li data-i18n="formula2"><strong>Net received:</strong> Amount − fee</li>
+      <li data-i18n="formula3"><strong>Total sent (sending):</strong> Amount + fee</li>
+      <li data-i18n="formula4"><strong>Reverse calculation:</strong> Desired net ÷ (1 − fee%) − fixed fee adjustment</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 data-i18n="howToTitle">How to use this calculator</h2>
+    <ol>
+      <li data-i18n="howTo1">Choose a mode: Receiving Money, Sending Money, or Target Net Amount.</li>
+      <li data-i18n="howTo2">Enter the amount.</li>
+      <li data-i18n="howTo3">Select your country or region to apply the correct fee rate.</li>
+      <li data-i18n="howTo4">For custom rates, expand Advanced settings and enter your fee percentage and fixed fee.</li>
+      <li data-i18n="howTo5">Click "Calculate" to see the fee breakdown and net amount.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2 data-i18n="faqTitle">Frequently asked questions</h2>
+    <h3 data-i18n="faq1q">How much does PayPal take per transaction?</h3>
+    <p data-i18n="faq1a">For a standard US commercial transaction of $100, PayPal takes approximately $3.48 (2.99% of $100 = $2.99, plus $0.49 fixed). You receive $96.52. For cross-border transactions, the rate is higher — around $5.48 for the same amount.</p>
+
+    <h3 data-i18n="faq2q">Is PayPal free for friends and family?</h3>
+    <p data-i18n="faq2a">Yes, in most cases. When you send money to friends or family in the same country using your PayPal balance or a linked bank account, there is no fee. Credit card and debit card funding still incur a fee. Cross-border friends and family transfers also incur fees.</p>
+
+    <h3 data-i18n="faq3q">How do I avoid PayPal fees when receiving money?</h3>
+    <p data-i18n="faq3a">You can't eliminate commercial transaction fees, but you can reduce them by: (1) using PayPal's micropayment rate for small transactions, (2) accepting payment in the same currency as your account to avoid conversion fees, and (3) passing the fee to the buyer by adding it to your price.</p>
+
+    <h3 data-i18n="faq4q">How do I calculate how much to charge to receive a target amount?</h3>
+    <p data-i18n="faq4a">Use the Target Net Amount mode. The formula is: Gross needed = (Target net + fixed fee) ÷ (1 − fee%). For example, to receive $100 net with a 2.99% + $0.49 fee: ($100 + $0.49) ÷ 0.9701 = $103.60.</p>
+
+    <h3 data-i18n="faq5q">Does PayPal charge a currency conversion fee?</h3>
+    <p data-i18n="faq5a">Yes. If you receive money in a currency different from your account's primary currency, PayPal charges a currency conversion fee of approximately 3-4% above the wholesale exchange rate. This is separate from the transaction fee.</p>
+
+    <div class="disclaimer" data-i18n="disclaimer"><strong>Disclaimer:</strong> This calculator provides estimates for educational purposes. PayPal's fee structure varies by country, currency, transaction type, and account status. Always verify current fees on PayPal's official fee page before making financial decisions.</div>
+  </section>
+
+  <section>
+    <h2 data-i18n="moreToolsTitle">More fee calculators</h2>
+    <p data-i18n="moreToolsText">Try our Etsy Fee Calculator and eBay Fee Calculator, or check back for Amazon FBA and Depop fee calculators.</p>
+  </section>
+</main>
+
+<footer class="footer" data-i18n="footer">Runs entirely in your browser. No data is collected or stored.</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/calculator.js"></script>
+</body>
+</html>
